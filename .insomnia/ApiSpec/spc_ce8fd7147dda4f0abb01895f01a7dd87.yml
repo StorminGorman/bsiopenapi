@@ -1,0 +1,412 @@
+_id: spc_ce8fd7147dda4f0abb01895f01a7dd87
+type: ApiSpec
+parentId: wrk_346fb6bc6edc4995a9ac88060a260d84
+modified: 1666928412108
+created: 1666928397212
+fileName: v3.yaml
+contents: >-
+  openapi: 3.0.0
+
+  info:
+    description: "The API version for both Portico and Atriuum"
+    version: 3.0.0
+    title: Book Systems API
+    contact:
+      email: bgorman@booksys.com
+  tags:
+    - name: Admin
+      description: Administrative and Server side
+    - name: Catalog
+      description: Catalog & Searching 
+    - name: Patron
+      description: Requiring Patron Login
+  paths:
+    /atriuum_version:
+      get:
+        tags:
+          - Admin
+        summary: Gets the server's version
+        description: ""
+        operationId: atriuumVersion
+        responses:
+          "200":
+            description: success
+            content:
+              application/json:
+                schema:
+                  type: object     
+                  properties:
+                    successful:
+                      type: boolean
+                    isOpen:
+                      type: boolean
+                    serverTime:
+                      type: string
+                      default: "09/25/2022 09:55:48AM"
+                    atriuumVersion:
+                      type: string
+                      default: "14.3.0"
+                    validAtriuum:
+                        type: boolean
+    /bibs/{itemid}:
+      get:
+        tags:
+          - Catalog
+        summary: Item Details
+        description: All bibliographic and holding information for a bibliographic record.
+        operationId: findPetsByStatus
+        parameters:
+          - name: itemid
+            in: path
+            description: The bib's ItemID
+            required: true
+            schema:
+              type: string
+        responses:
+          "200":
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/BibDetails"
+  externalDocs:
+    description: Documentation
+    url: https://booksys.clickhelp.co/
+  servers:
+    - url: https://booksys.dev/api/v3/test/
+  #   - url: https://librista.com
+
+  components:
+    #requestBodies:
+    schemas:
+      BasicPatron:
+        type: object
+        properties:
+          id:
+            type: string
+            default: "1234" 
+          name:
+            type: string
+            default: "Brian Gorman" 
+          first_name_last_name:
+            type: string
+            default: "Brian Gorman" 
+          first_name:
+            type: string
+            default: "Brian" 
+          last_name:
+            type: string
+            default: "Gorman" 
+          nickname:
+            type: string
+            default: "Big B" 
+          barcode:
+            type: string
+            default: "54321" 
+      PatronReview:
+        type: object
+        properties:
+          patron:
+            $ref: "#/components/schemas/BasicPatron"
+          rating:
+            type: number
+            default: 3 
+          review:
+            type: string
+            default: "This Book is good." 
+          approved:
+            type: boolean
+            default: true
+          patron_id:
+            type: string
+            default: "1234" 
+          patron_name:
+            type: string
+            default: "Gorman, Brian" 
+      ReadingLevelValue:
+        type: object
+        properties:
+          display:
+            type: string
+            default: "1234"
+          number:
+            type: number
+            default: 1234 
+      ReadingLevel:
+        type: object
+        properties:
+          lexile:
+            $ref: "#/components/schemas/ReadingLevelValue"      
+          fountas_pinnell:
+            $ref: "#/components/schemas/ReadingLevelValue"      
+          study_programs:
+            type: array
+            items:
+              type: object
+              properties:
+                 name:
+                   type: string
+                   default: "Accelerated Reader" 
+                 abbreviation:
+                   type: string
+                   default: "AR" 
+                 number:
+                   type: number
+                   default: 2
+                 points:
+                   type: number
+                   default: 2
+                 interest_level:
+                   type: string
+                   default: "MG Plus" 
+                 quiz:
+                   type: string
+                   default: "1234" 
+      ItemType:
+        type: object
+        properties:
+          code:
+            type: string
+            default: "a"
+          value:
+            type: string
+            default: "some_value"
+          readable:
+            type: string
+            default: "Some Value"
+      Series:
+        type: object
+        properties:
+          title:
+            type: string
+            default: "B Books"
+          volume:
+            type: string
+            default: "B"
+          number:
+            type: integer
+            default: 1
+      MaterialType:
+        type: object
+        properties:
+          code:
+            type: string
+            default: "a"
+          value:
+            type: string
+            default: "Book"
+          readable:
+            type: string
+            default: "Book"
+          generic_dust_jacket:
+            type: string
+            default: "Default"
+          icon:
+            type: string
+            default: "Default"
+      DustJacket:
+        type: object
+        properties:
+          is_generic:
+            type: boolean
+            default: false
+          small:
+            type: string
+            default: "https://imagehost/1234/small"
+          medium:
+            type: string
+            default: "https://imagehost/1234/medium"
+          large:
+            type: string
+            default: "https://imagehost/1234/large"
+          generic:
+            type: string
+            default: "Default"
+      BasicBib:
+        type: object
+        properties:
+          id:
+            type: string
+            default: "1234"
+          title:
+            type: string
+            default: "Some Title" 
+          author:
+            type: string
+            default: "Person, Some" 
+          material_type:
+            $ref: "#/components/schemas/MaterialType"
+          dust_jacket:
+            $ref: "#/components/schemas/DustJacket"
+      SummaryBib:
+        type: object
+        properties:
+          basic:
+            $ref: "#/components/schemas/BasicBib"
+          extended_title:
+            type: string
+            default: "'L' is for library / Sonya Terry ; illustrated by Nicole Wong."
+          artist:
+            type: string
+            default: ""
+          aacr2_physical_description:
+            type: string
+            default: "1 v. (unpaged) : col. ill. ; 21 x 26 cm."
+          aacr2_publisher:
+            type: string
+            default: "Fort Atkinson, Wis. : Upstart Books,"
+          publisher:
+            type: string
+            default: "Upstart Books"
+          place_of_publication:
+            type: string
+            default: "Fort Atkinson, Wis."
+          publication_date:
+            type: string
+            default: ""
+          copyright_date:
+            type: string
+            default: "c2006."
+          summary:
+            type: string
+            default: "Following a friendly tabby cat, children will pounce and prance through the stacks from A-Z as they discover everything there is to do and see in the library. -- publisher's web site."
+          trailer_url:
+            type: string
+            default: ""
+          isbns:
+            type: array
+            items:
+              type: string
+              default: "123456789X"
+          upcs:
+            type: array
+            items:
+              type: string
+              default: "1212412421421214214"
+          series:
+            type: array
+            items:
+              $ref: "#/components/schemas/Series"
+          availability : 
+            type: object
+            properties: 
+              available_copies:
+                type: number
+                default: 4
+              copies:
+                type: number
+                default: 4
+              available_sets:
+                type: number
+                default: 0
+              sets:
+                type: number
+                default: 0
+              set_size:
+                type: number
+                default: 0
+          age_group:    
+            type: array
+            items:
+              $ref: "#/components/schemas/ItemType"
+          item_status:
+            type: string
+            default: "IN"
+          ratings:
+            type: object
+            properties:
+                average:
+                  type: number
+                  default: -1
+                count:
+                  type: number
+                  default: 0
+          call_numbers:
+            type: array
+            items:
+              type: string
+              default: "121.1 ASD"
+          locations:    
+            type: array
+            items:
+              $ref: "#/components/schemas/ItemType"
+          sublocations:    
+            type: array
+            items:
+              $ref: "#/components/schemas/ItemType"
+          available_locations:    
+            type: array
+            items:
+              $ref: "#/components/schemas/ItemType"
+          available_sublocations:    
+            type: array
+            items:
+              $ref: "#/components/schemas/ItemType"
+          is_ebook:
+            type: boolean
+            default: false
+          individual_reserve:
+            type: boolean
+            default: false
+          urls:
+            type: array
+            items:
+              type: object
+              properties:
+                url:
+                  type: string
+                  default: "ViewOPACURL?itemid=33059&sequenceNum=0"
+                original_url:
+                  type: string
+                  default: "http://booksys.dev"
+                note:
+                  type: string
+                  default: "Book Systems Development"
+                requires_patron_login:
+                  type: boolean
+                  default: false
+          reading_level:
+            $ref: "#/components/schemas/ReadingLevel"       
+      BibDetails:
+        type: object
+        properties:
+          summary:
+            $ref: "#/components/schemas/SummaryBib"
+          reviews:
+            type: array
+            items:
+              $ref: "#/components/schemas/PatronReview"            
+          artist:
+            type: string
+            default: ""
+          description:
+            type: string
+            default: "1 v. (unpaged) : col. ill. ; 21 x 26 cm."
+          notes:
+            type: string
+            default: "Following a friendly tabby cat, children will pounce and prance through the stacks from A-Z as they discover everything there is to do and see in the library. -- publisher's web site."
+          place_of_publication:
+            type: string
+            default: "Fort Atkinson, Wis."
+          publication_date:
+            type: string
+            default: ""
+          copyright_date:
+            type: string
+            default: "c2006."
+          statement_of_responsibility:
+            type: string
+            default: "Sonya Terry ; illustrated by Nicole Wong."
+          publisher:
+            type: string
+            default: "Upstart Books"
+          aacr2_physical_description:
+            type: string
+            default: "1 v. (unpaged) : col. ill. ; 21 x 26 cm."
+          aacr2_publisher:
+            type: string
+            default: "Fort Atkinson, Wis. : Upstart Books,"
+          individual_reserve:
+            type: boolean
+            default: false           
+contentType: yaml
